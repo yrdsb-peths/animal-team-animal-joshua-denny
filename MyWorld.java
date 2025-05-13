@@ -1,40 +1,43 @@
 import greenfoot.*;
 
 public class MyWorld extends World {
-    private int score = 0;
-    private int gameOverValue = 5;
-    
-    private Label gameOverLabel;
-    private Label scoreLabel;
-    Elephant elephant;
-    
+    public int score = 0;
+    Label scoreLabel;
+    int level = 1;
     public MyWorld() {
-        super(900, 600, 1);
-        elephant = new Elephant();
-        addObject(elephant, getWidth()/2, getHeight()/2);
+        super(640, 359, 1, false);
         
-        scoreLabel = new Label("Score: 0",30);
+        Elephant elephant  = new Elephant();
+        addObject(elephant, 300, 300);
         
-        addObject(scoreLabel,scoreLabel.getFontSize()/2 + 30, scoreLabel.getFontSize()/2);
-
-        if (score >= gameOverValue) 
-        {
-            gameOver();
-        }
+        scoreLabel = new Label(0, 20);
+        addObject(scoreLabel, 20, 20);
+        
+        createApple();
     }
     
-    public void gameOver()
+    public void gameOver() 
     {
-        gameOverLabel = new Label("Game Over", 50);
-        addObject(gameOverLabel,getWidth()/2, getHeight()/2);
+        Label gameOverLabel = new Label("GameOver", 100);
+        addObject(gameOverLabel, 300, 200);
+    }
+    
+    public void increaseScore() 
+    {
+        score++;
+        scoreLabel.setValue(score);
         
-        removeObject(elephant);
+        if(score % 5 == 0) {
+            level += 1;
+        }
     }
     
     public void createApple()
     {
-        //Apple apple = new Apple();
-        //apple.setSpeed(level);
-        //addObject(apple, Greenfoot.getRandomNumber(getWidth()), 0);
+        Apple apple = new Apple();
+        apple.setSpeed(level);
+        int x = Greenfoot.getRandomNumber(600);
+        int y = Greenfoot.getRandomNumber(50);
+        addObject(apple, x, y);
     }
 }
