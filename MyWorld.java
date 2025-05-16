@@ -14,6 +14,8 @@ public class MyWorld extends World {
         addObject(scoreLabel, 20, 20);
         
         createApple();
+        Greenfoot.setWorld(new TitleScreen());
+
     }
     
     public void gameOver() 
