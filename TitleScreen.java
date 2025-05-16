@@ -20,6 +20,9 @@ public class TitleScreen extends World
 
         addObject(titleLabel, getWidth()/2, 100);
         prepare();
+        
+        GreenfootImage bg = new GreenfootImage("images/istockphoto-1140829787-612x612.jpg");
+        setBackground(bg);
     }
 
     public void act() 

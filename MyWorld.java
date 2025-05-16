@@ -15,6 +15,10 @@ public class MyWorld extends World {
         
         createApple();
         Greenfoot.setWorld(new TitleScreen());
+        
+        GreenfootImage bg = new GreenfootImage("images/download.jpg");
+        setBackground(bg);
+
 
     }
     
