@@ -142,102 +142,102 @@ public class Elephant extends Actor
     }
 
     public void handleJumping()
+{
+    if (!onGround) 
     {
-        if (!onGround) 
-        {
-            yVelocity += gravity;
-            setLocation(getX(), getY() + yVelocity);
-        }
+        yVelocity += gravity;
+        setLocation(getX(), getY() + yVelocity);
+    }
 
-        if (!onGround)
-        {
-            justLanded = false;
+    if (!onGround)
+    {
+        justLanded = false;
 
-            // Set jumping animation frames based on yVelocity
-            GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
+        // Set jumping animation frames based on yVelocity
+        GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
 
-            if (yVelocity < -10) {
-                setImage(jumpSet[1]);
-            } 
-            else if (yVelocity < -3) {
-                setImage(jumpSet[2]);
-            } 
-            else if (yVelocity <= 0) {
-                setImage(jumpSet[3]); // Apex
-            } 
-            else if (yVelocity <= 6) {
-                setImage(jumpSet[4]); // Descending
-            } 
-            else if (yVelocity <= 12) {
-                setImage(jumpSet[5]); // Faster descent
-            } 
-            else {
-                setImage(jumpSet[6]); // Near landing
-            }
-        }
-
-        // Detect landing
-        int groundLevel = getWorld().getHeight() - floorHeight - getImage().getHeight() / 2;
-
-        if (getY() >= groundLevel)
-        {
-            if (!onGround)
-            {
-                setLocation(getX(), groundLevel);
-                yVelocity = 0;
-                onGround = true;
-                jumping = false;
-                justLanded = true;
-                landingFrameCounter = 0;
-                landingFrameTimer = 0;
-            }
-        }
-
-        // Play landing animation only once after landing with slowdown and squash/stretch
-        if (justLanded)
-        {
-            GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
-
-            if (landingFrameCounter < 3)
-            {
-                // Slow down animation: update frame every landingFrameDelay acts
-                if (landingFrameTimer == 0) 
-                {
-                    setImage(jumpSet[7 + landingFrameCounter]);
-
-                    // Add squash/stretch on impact frame (landingFrameCounter == 1)
-                    if (landingFrameCounter == 1) 
-                    {
-                        GreenfootImage img = getImage();
-                        img.scale((int)(img.getWidth() * 1.1), (int)(img.getHeight() * 0.9)); // wider & shorter
-                        setImage(img);
-                    }
-                    else
-                    {
-                        // Reset scale on other frames
-                        GreenfootImage img = jumpSet[7 + landingFrameCounter];
-                        img.scale(100, 100);
-                        setImage(img);
-                    }
-                }
-
-                landingFrameTimer++;
-                if (landingFrameTimer >= landingFrameDelay)
-                {
-                    landingFrameTimer = 0;
-                    landingFrameCounter++;
-                }
-            }
-            else
-            {
-                justLanded = false; // Done landing animation
-
-                // Reset to idle image facing correct direction after landing animation
-                GreenfootImage[] idleSet = (facing.equals("right")) ? idleRight : idleLeft;
-                setImage(idleSet[0]);
-            }
+        if (yVelocity < -10) {
+            setImage(jumpSet[1]);
+        } 
+        else if (yVelocity < -3) {
+            setImage(jumpSet[2]);
+        } 
+        else if (yVelocity <= 0) {
+            setImage(jumpSet[3]); // Apex
+        } 
+        else if (yVelocity <= 6) {
+            setImage(jumpSet[4]); // Descending
+        } 
+        else if (yVelocity <= 12) {
+            setImage(jumpSet[5]); // Faster descent
+        } 
+        else {
+            setImage(jumpSet[6]); // Near landing
         }
     }
+
+    // Detect landing
+    int groundLevel = getWorld().getHeight() - floorHeight - getImage().getHeight() / 2;
+
+    if (getY() >= groundLevel)
+    {
+        if (!onGround)
+        {
+            setLocation(getX(), groundLevel);
+            yVelocity = 0;
+            onGround = true;
+            jumping = false;
+            justLanded = true;
+            landingFrameCounter = 0;
+            landingFrameTimer = 0;
+        }
+    }
+
+    // Play landing animation only once after landing with slowdown and squash/stretch
+    if (justLanded)
+    {
+        GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
+
+        if (landingFrameCounter < 3)
+        {
+            // Slow down animation: update frame every landingFrameDelay acts
+            if (landingFrameTimer == 0) 
+            {
+                if (landingFrameCounter == 1) 
+                {
+                    // Use fresh copy of original image to prevent cumulative scaling
+                    GreenfootImage baseImg = jumpSet[7 + landingFrameCounter];
+                    GreenfootImage img = new GreenfootImage(baseImg);
+                    img.scale((int)(baseImg.getWidth() * 1.1), (int)(baseImg.getHeight() * 0.9)); // wider & shorter
+                    setImage(img);
+                }
+                else
+                {
+                    // Reset scale to original 100x100
+                    GreenfootImage baseImg = jumpSet[7 + landingFrameCounter];
+                    GreenfootImage img = new GreenfootImage(baseImg);
+                    img.scale(100, 100);
+                    setImage(img);
+                }
+            }
+
+            landingFrameTimer++;
+            if (landingFrameTimer >= landingFrameDelay)
+            {
+                landingFrameTimer = 0;
+                landingFrameCounter++;
+            }
+        }
+        else
+        {
+            justLanded = false; // Done landing animation
+
+            // Reset to idle image facing correct direction after landing animation
+            GreenfootImage[] idleSet = (facing.equals("right")) ? idleRight : idleLeft;
+            setImage(idleSet[0]);
+        }
+    }
+}
 
     public void animateIdle() 
     {

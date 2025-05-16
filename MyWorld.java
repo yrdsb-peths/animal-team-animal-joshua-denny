@@ -4,6 +4,7 @@ public class MyWorld extends World {
     public int score = 0;
     Label scoreLabel;
     int level = 1;
+    final int floorHeight = 0;
 
     private boolean isGameOver = false;
 
@@ -26,7 +27,8 @@ public class MyWorld extends World {
 
         // Assign to field, NOT local variable
         elephant = new Elephant();
-        addObject(elephant, 300, 300);
+        addObject(elephant, 300, getHeight() - floorHeight - elephant.getImage().getHeight() / 2);
+
 
         scoreLabel = new Label(0, 20);
         addObject(scoreLabel, 20, 20);
@@ -71,16 +73,19 @@ public class MyWorld extends World {
 
     public void spawnObstacle() {
         Obstacle snake = new Obstacle();
-        
-        // Get elephant's feet Y position (center Y + half height)
+    
+        int floorY = getHeight() - floorHeight;
+    
+        // Elephant feet Y position
         int elephantFeetY = elephant.getY() + elephant.getImage().getHeight() / 2;
     
-        // The snake's image height half
+        // Snake half height
         int snakeHalfHeight = snake.getImage().getHeight() / 2;
     
-        // Position the snake so its feet are at the same Y as the elephant's feet
-        int snakeY = elephantFeetY - snakeHalfHeight;
+        // Use floorY for better consistency
+        int snakeY = floorY - snakeHalfHeight;
     
-        addObject(snake, getWidth(), snakeY); // spawn at right edge, same ground level as elephant
+        addObject(snake, getWidth(), snakeY);
     }
+    
 }
