@@ -12,6 +12,12 @@ public class Elephant extends Actor
      * Act - do whatever the Elephant wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
+    int yVelocity = 0;
+    int gravity = 1;
+    int jumpStrength = -15;
+    boolean onGround = false;
+
+    
     GreenfootSound elephantSound = new GreenfootSound("elephant-scream.mp3");
     GreenfootImage idleRight[]  = new GreenfootImage[8];
     GreenfootImage idleLeft[]  = new GreenfootImage[8];
@@ -82,33 +88,6 @@ public class Elephant extends Actor
             imageIndex = (imageIndex + 1) %runLeft.length;
         }
     }
-    /*GreenfootImage[] right = new GreenfootImage[2];
-    GreenfootImage[] left = new GreenfootImage[2];
-    public Elephant() 
-    {
-        for (int i = 0; i < right.length; i++) 
-        {
-            right[i] = new GreenfootImage("images/elephant-move/sprite" + i + ".png");
-        }
-        for (int i = 0; i < left.length; i++) 
-        {
-            left[i] = new GreenfootImage("images/elephant-move/sprite" + (i + 3) + ".png");
-        }
-        setImage(right[0]);
-    }
-    int imageIndex =0;
-    public void animateElephantRight() 
-    {
-        setImage(right[imageIndex]);
-        imageIndex = (imageIndex + 1) % right.length;
-
-    }
-    public void animateElephantLeft() 
-    {
-        setImage(left[imageIndex]);
-        imageIndex = (imageIndex + 1) % left.length;
-
-    }*/
     
     public void act()
     {
@@ -117,22 +96,49 @@ public class Elephant extends Actor
         {
             move(-5);
             facing = "left";
-            //animateElephantLeft();
+            
         }
         else if (Greenfoot.isKeyDown("right")) 
         {
             move(5);
-            //animateElephantRight();
+            
             facing = "right";
         }
+        
+        if (Greenfoot.isKeyDown("space") && onGround)
+        {
+            jump();
+        }
+        applyGravity();
         eat();
         animateIdle();
     }
+    public void jump()
+    {
+        yVelocity = jumpStrength;
+        onGround = false;
+    }
+    public void applyGravity()
+    {
+        yVelocity += gravity;
+        setLocation(getX(), getY() + yVelocity);
+    
+        int groundLevel = getWorld().getHeight() - getImage().getHeight() / 2;
+    
+        if (getY() >= groundLevel)
+        {
+            setLocation(getX(), groundLevel);
+            yVelocity = 0;
+            onGround = true;
+        }
+    }
+
+    
     public void eat() 
     {
         if(isTouching(Apple.class)) 
         {
-            removeTouching(Apple.class);
+            removeTouching(Apple.class);    
             MyWorld world = (MyWorld) getWorld();
             world.createApple();
             world.increaseScore();
