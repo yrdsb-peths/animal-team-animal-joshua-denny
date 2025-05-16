@@ -1,4 +1,9 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+//Changes to this class include adding a running animation, 
+//adding gravity physics, adding a jumping and falling animation
+
+
+
 
 public class Elephant extends Actor
 {
