@@ -27,15 +27,18 @@ public class Elephant extends Actor
     GreenfootImage runLeft[]    = new GreenfootImage[8];
     GreenfootImage jumpRight[]  = new GreenfootImage[10];  // jump0.png to jump9.png facing right
     GreenfootImage jumpLeft[]   = new GreenfootImage[10];  // mirrored jump images for left
-    final int floorHeight = 50; // adjust this to your floor/platform height
+    final int floorHeight = 0; // adjust this to your floor/platform height
 
     String facing = "right";
     SimpleTimer animationTimer = new SimpleTimer();
+    SimpleTimer jumpCooldownTimer = new SimpleTimer();
+    int jumpCooldownDuration = 500;
     int imageIndex = 0;
 
     public Elephant() 
     {
         setRotation(0);
+        jumpCooldownTimer.mark();  // start timer
 
         // Load idle right and left
         for (int i = 0; i < idleRight.length; i++) 
@@ -99,10 +102,13 @@ public class Elephant extends Actor
         }
     
         // Jump input
-        if (Greenfoot.isKeyDown("space") && onGround) 
+        // Jump input with cooldown
+        if (Greenfoot.isKeyDown("space") && onGround && jumpCooldownTimer.millisElapsed() > jumpCooldownDuration) 
         {
             jump();
+            jumpCooldownTimer.mark();  // reset cooldown timer
         }
+
     
         // Handle physics and animation
         handleJumping();
