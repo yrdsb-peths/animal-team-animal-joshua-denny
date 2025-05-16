@@ -13,12 +13,17 @@ public class Obstacle extends Actor
 
     public void act()
     {
+        MyWorld world = (MyWorld) getWorld();
+    
+        if (world.getGameOver()) return;
+    
         setLocation(getX() - speed, getY());
-
+    
         if (getX() < -getImage().getWidth()) {
             getWorld().removeObject(this);
         }
     }
+
 
     public void setSpeed(int s)
     {

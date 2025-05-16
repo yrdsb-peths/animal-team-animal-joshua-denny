@@ -17,7 +17,6 @@ public class Elephant extends Actor
     int landingFrameCounter = 0;
     int landingFrameDelay = 5;  // frames to wait per landing animation frame
     int landingFrameTimer = 0;
-
     // Audio
     GreenfootSound elephantSound = new GreenfootSound("elephant-scream.mp3");
 
@@ -77,7 +76,17 @@ public class Elephant extends Actor
 
     public void act()
     {
-        // Movement input
+        World currentWorld = getWorld();
+    
+        // If in MyWorld and game is over, stop all actions
+        if (currentWorld instanceof MyWorld) {
+            MyWorld world = (MyWorld) currentWorld;
+            if (world.getGameOver()) {
+                return;  // Stop all movement and logic if game is over
+            }
+        }
+    
+        // Movement always allowed (unless game over above)
         if (Greenfoot.isKeyDown("left")) 
         {
             move(-6);
@@ -88,32 +97,36 @@ public class Elephant extends Actor
             move(6);
             facing = "right";
         }
-
+    
         // Jump input
         if (Greenfoot.isKeyDown("space") && onGround) 
         {
             jump();
         }
-
-        // Jumping physics and animation
+    
+        // Handle physics and animation
         handleJumping();
-
-        // Eat logic
-        eat();
-
-        // Idle/run animation only when not jumping or landing
         if (!jumping && !justLanded) 
         {
             animateIdle();
         }
-        
-        if (isTouching(Obstacle.class)) {
-            MyWorld world = (MyWorld) getWorld();
-            world.gameOver(); // Or any response
+    
+        // Gameplay logic (apples & obstacles) only in MyWorld
+        if (currentWorld instanceof MyWorld)
+        {
+            MyWorld world = (MyWorld) currentWorld;
+    
+            eat();
+    
+            if (isTouching(Obstacle.class)) 
+            {
+                world.gameOver();
+            }
         }
-
-        
     }
+
+
+
 
     public void jump()
     {
