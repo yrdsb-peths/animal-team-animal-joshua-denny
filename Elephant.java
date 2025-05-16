@@ -80,12 +80,12 @@ public class Elephant extends Actor
         // Movement input
         if (Greenfoot.isKeyDown("left")) 
         {
-            move(-5);
+            move(-6);
             facing = "left";
         } 
         else if (Greenfoot.isKeyDown("right")) 
         {
-            move(5);
+            move(6);
             facing = "right";
         }
 
@@ -106,6 +106,13 @@ public class Elephant extends Actor
         {
             animateIdle();
         }
+        
+        if (isTouching(Obstacle.class)) {
+            MyWorld world = (MyWorld) getWorld();
+            world.gameOver(); // Or any response
+        }
+
+        
     }
 
     public void jump()

@@ -4,6 +4,8 @@ public class MyWorld extends World {
     public int score = 0;
     Label scoreLabel;
     int level = 1;
+
+    SimpleTimer obstacleTimer = new SimpleTimer(); // Use this for timing
     public MyWorld() {
         super(640, 359, 1, false);
         
@@ -46,4 +48,24 @@ public class MyWorld extends World {
         int y = Greenfoot.getRandomNumber(50);
         addObject(apple, x, y);
     }
+        public void act()
+    {
+        if (obstacleTimer.millisElapsed() > Greenfoot.getRandomNumber(20000) + 5000)  // every 2 seconds
+        {
+            spawnObstacle();
+            obstacleTimer.mark();
+        }
+    }
+    
+    public void spawnObstacle()
+    {
+        Obstacle snake = new Obstacle();
+        
+        // Get Y position of elephant's feet (ground level)
+        int groundY = getHeight() - 50 - snake.getImage().getHeight() / 2;
+            
+        addObject(snake, getWidth(), groundY);
+    }
+
+
 }
