@@ -1,9 +1,4 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-//Changes to this class include adding a running animation, 
-//adding gravity physics, adding a jumping and falling animation
-
-
-
 
 public class Elephant extends Actor
 {
@@ -15,8 +10,14 @@ public class Elephant extends Actor
     boolean jumping = false;
     boolean justLanded = false;
     int landingFrameCounter = 0;
-    int landingFrameDelay = 5;  // frames to wait per landing animation frame
+    int landingFrameDelay = 5;
     int landingFrameTimer = 0;
+
+    // Jump preparation state
+    boolean preparingJump = false;
+    int jumpPrepDelay = 100; // milliseconds
+    SimpleTimer jumpPrepTimer = new SimpleTimer();
+
     // Audio
     GreenfootSound elephantSound = new GreenfootSound("elephant-scream.mp3");
 
@@ -25,11 +26,13 @@ public class Elephant extends Actor
     GreenfootImage idleLeft[]   = new GreenfootImage[8];
     GreenfootImage runRight[]   = new GreenfootImage[8];
     GreenfootImage runLeft[]    = new GreenfootImage[8];
-    GreenfootImage jumpRight[]  = new GreenfootImage[10];  // jump0.png to jump9.png facing right
-    GreenfootImage jumpLeft[]   = new GreenfootImage[10];  // mirrored jump images for left
-    final int floorHeight = 0; // adjust this to your floor/platform height
+    GreenfootImage jumpRight[]  = new GreenfootImage[10];
+    GreenfootImage jumpLeft[]   = new GreenfootImage[10];
+
+    final int floorHeight = 0;
     int size = 75;
     String facing = "right";
+
     SimpleTimer animationTimer = new SimpleTimer();
     SimpleTimer jumpCooldownTimer = new SimpleTimer();
     int jumpCooldownDuration = 500;
@@ -38,36 +41,33 @@ public class Elephant extends Actor
     public Elephant() 
     {
         setRotation(0);
-        jumpCooldownTimer.mark();  // start timer
+        jumpCooldownTimer.mark();
 
-        // Load idle right and left
+        // Load idle and mirrored
         for (int i = 0; i < idleRight.length; i++) 
         {
             idleRight[i] = new GreenfootImage("images/idleAnimation/idle" + i + ".png");
             idleRight[i].scale(size, size);
-
             idleLeft[i] = new GreenfootImage("images/idleAnimation/idle" + i + ".png");
             idleLeft[i].mirrorHorizontally();
             idleLeft[i].scale(size, size);
         }
 
-        // Load running right and left
+        // Load run and mirrored
         for (int i = 0; i < runRight.length; i++) 
         {
             runRight[i] = new GreenfootImage("images/running/run" + i + ".png");
             runRight[i].scale(size, size);
-
             runLeft[i] = new GreenfootImage("images/running/run" + i + ".png");
             runLeft[i].mirrorHorizontally();
             runLeft[i].scale(size, size);
         }
 
-        // Load jump frames right and left (mirrored)
+        // Load jump and mirrored
         for (int i = 0; i < jumpRight.length; i++) 
         {
             jumpRight[i] = new GreenfootImage("images/jump/jump" + i + ".png");
             jumpRight[i].scale(size, size);
-
             jumpLeft[i] = new GreenfootImage("images/jump/jump" + i + ".png");
             jumpLeft[i].mirrorHorizontally();
             jumpLeft[i].scale(size, size);
@@ -80,16 +80,12 @@ public class Elephant extends Actor
     public void act()
     {
         World currentWorld = getWorld();
-    
-        // If in MyWorld and game is over, stop all actions
+
         if (currentWorld instanceof MyWorld) {
             MyWorld world = (MyWorld) currentWorld;
-            if (world.getGameOver()) {
-                return;  // Stop all movement and logic if game is over
-            }
+            if (world.getGameOver()) return;
         }
-    
-        // Movement always allowed (unless game over above)
+
         if (Greenfoot.isKeyDown("left")) 
         {
             move(-6);
@@ -100,30 +96,34 @@ public class Elephant extends Actor
             move(6);
             facing = "right";
         }
-    
-        // Jump input
-        // Jump input with cooldown
-        if (Greenfoot.isKeyDown("space") && onGround && jumpCooldownTimer.millisElapsed() > jumpCooldownDuration) 
+
+        // Prepare for jump if not already in delay
+        if (Greenfoot.isKeyDown("space") && onGround && !preparingJump && jumpCooldownTimer.millisElapsed() > jumpCooldownDuration) 
         {
-            jump();
-            jumpCooldownTimer.mark();  // reset cooldown timer
+            prepareJump();
         }
 
-    
-        // Handle physics and animation
+        // Finish jump after delay
+        if (preparingJump && jumpPrepTimer.millisElapsed() >= jumpPrepDelay)
+        {
+            executeJump();
+            jumpCooldownTimer.mark();
+            preparingJump = false;
+        }
+
         handleJumping();
-        if (!jumping && !justLanded) 
+
+        if (!jumping && !justLanded && !preparingJump) 
         {
             animateIdle();
         }
-    
-        // Gameplay logic (apples & obstacles) only in MyWorld
+
         if (currentWorld instanceof MyWorld)
         {
             MyWorld world = (MyWorld) currentWorld;
-    
+
             eat();
-    
+
             if (isTouching(Obstacle.class)) 
             {
                 world.gameOver();
@@ -131,113 +131,108 @@ public class Elephant extends Actor
         }
     }
 
+    public void prepareJump()
+    {
+        preparingJump = true;
+        jumpPrepTimer.mark();
 
+        GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
+        setImage(jumpSet[0]); // Crouch/charge frame
+    }
 
-
-    public void jump()
+    public void executeJump()
     {
         yVelocity = jumpStrength;
         onGround = false;
         jumping = true;
+
+        GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
+        setImage(jumpSet[1]); // Launch frame
     }
 
     public void handleJumping()
-{
-    if (!onGround) 
     {
-        yVelocity += gravity;
-        setLocation(getX(), getY() + yVelocity);
-    }
-
-    if (!onGround)
-    {
-        justLanded = false;
-
-        // Set jumping animation frames based on yVelocity
-        GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
-
-        if (yVelocity < -10) {
-            setImage(jumpSet[1]);
-        } 
-        else if (yVelocity < -3) {
-            setImage(jumpSet[2]);
-        } 
-        else if (yVelocity <= 0) {
-            setImage(jumpSet[3]); // Apex
-        } 
-        else if (yVelocity <= 6) {
-            setImage(jumpSet[4]); // Descending
-        } 
-        else if (yVelocity <= 12) {
-            setImage(jumpSet[5]); // Faster descent
-        } 
-        else {
-            setImage(jumpSet[6]); // Near landing
+        if (!onGround) 
+        {
+            yVelocity += gravity;
+            setLocation(getX(), getY() + yVelocity);
         }
-    }
 
-    // Detect landing
-    int groundLevel = getWorld().getHeight() - floorHeight - getImage().getHeight() / 2;
-
-    if (getY() >= groundLevel)
-    {
         if (!onGround)
         {
-            setLocation(getX(), groundLevel);
-            yVelocity = 0;
-            onGround = true;
-            jumping = false;
-            justLanded = true;
-            landingFrameCounter = 0;
-            landingFrameTimer = 0;
-        }
-    }
+            justLanded = false;
+            GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
 
-    // Play landing animation only once after landing with slowdown and squash/stretch
-    if (justLanded)
-    {
-        GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
-
-        if (landingFrameCounter < 3)
-        {
-            // Slow down animation: update frame every landingFrameDelay acts
-            if (landingFrameTimer == 0) 
-            {
-                if (landingFrameCounter == 1) 
-                {
-                    // Use fresh copy of original image to prevent cumulative scaling
-                    GreenfootImage baseImg = jumpSet[7 + landingFrameCounter];
-                    GreenfootImage img = new GreenfootImage(baseImg);
-                    img.scale((int)(baseImg.getWidth() * 1.1), (int)(baseImg.getHeight() * 0.9)); // wider & shorter
-                    setImage(img);
-                }
-                else
-                {
-                    // Reset scale to original 100x100
-                    GreenfootImage baseImg = jumpSet[7 + landingFrameCounter];
-                    GreenfootImage img = new GreenfootImage(baseImg);
-                    img.scale(size, size);
-                    setImage(img);
-                }
+            if (yVelocity < -10) {
+                setImage(jumpSet[1]);
+            } else if (yVelocity < -3) {
+                setImage(jumpSet[2]);
+            } else if (yVelocity <= 0) {
+                setImage(jumpSet[3]);
+            } else if (yVelocity <= 6) {
+                setImage(jumpSet[4]);
+            } else if (yVelocity <= 12) {
+                setImage(jumpSet[5]);
+            } else {
+                setImage(jumpSet[6]);
             }
+        }
 
-            landingFrameTimer++;
-            if (landingFrameTimer >= landingFrameDelay)
+        int groundLevel = getWorld().getHeight() - floorHeight - getImage().getHeight() / 2;
+
+        if (getY() >= groundLevel)
+        {
+            if (!onGround)
             {
+                setLocation(getX(), groundLevel);
+                yVelocity = 0;
+                onGround = true;
+                jumping = false;
+                justLanded = true;
+                landingFrameCounter = 0;
                 landingFrameTimer = 0;
-                landingFrameCounter++;
             }
         }
-        else
-        {
-            justLanded = false; // Done landing animation
 
-            // Reset to idle image facing correct direction after landing animation
-            GreenfootImage[] idleSet = (facing.equals("right")) ? idleRight : idleLeft;
-            setImage(idleSet[0]);
+        if (justLanded)
+        {
+            GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
+
+            if (landingFrameCounter < 3)
+            {
+                if (landingFrameTimer == 0) 
+                {
+                    if (landingFrameCounter == 1) 
+                    {
+                        GreenfootImage baseImg = jumpSet[7 + landingFrameCounter];
+                        GreenfootImage img = new GreenfootImage(baseImg);
+                        img.scale((int)(baseImg.getWidth() * 1.1), (int)(baseImg.getHeight() * 0.9));
+                        setImage(img);
+                    }
+                    else
+                    {
+                        GreenfootImage baseImg = jumpSet[7 + landingFrameCounter];
+                        GreenfootImage img = new GreenfootImage(baseImg);
+                        img.scale(size, size);
+                        setImage(img);
+                    }
+                }
+
+                landingFrameTimer++;
+                if (landingFrameTimer >= landingFrameDelay)
+                {
+                    landingFrameTimer = 0;
+                    landingFrameCounter++;
+                }
+            }
+            else
+            {
+                justLanded = false;
+                GreenfootImage[] idleSet = (facing.equals("right")) ? idleRight : idleLeft;
+                setImage(idleSet[0]);
+            }
         }
     }
-}
 
     public void animateIdle() 
     {
