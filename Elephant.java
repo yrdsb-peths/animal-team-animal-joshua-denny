@@ -35,7 +35,7 @@ public class Elephant extends Actor
 
     SimpleTimer animationTimer = new SimpleTimer();
     SimpleTimer jumpCooldownTimer = new SimpleTimer();
-    int jumpCooldownDuration = 500;
+    int jumpCooldownDuration = 1500;
     int imageIndex = 0;
 
     public Elephant() 
