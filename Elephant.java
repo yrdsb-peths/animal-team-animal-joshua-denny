@@ -15,10 +15,11 @@ public class Elephant extends Actor
     GreenfootSound elephantSound = new GreenfootSound("elephant-scream.mp3");
     GreenfootImage idleRight[]  = new GreenfootImage[8];
     GreenfootImage idleLeft[]  = new GreenfootImage[8];
-    
+    GreenfootImage runRight[] = new GreenfootImage[8];
+    GreenfootImage runLeft[] = new GreenfootImage[8];
     String facing = "right";
     SimpleTimer animationTimer = new SimpleTimer();
-    //"images/idleAnimation/Idle1.png"
+    
     public Elephant() 
     {
         for (int i = 0; i < idleRight.length; i++) 
@@ -33,6 +34,19 @@ public class Elephant extends Actor
             idleLeft[i].mirrorHorizontally();
             idleLeft[i].scale(100, 100);
         }
+        
+        for (int i = 0; i < runRight.length; i++) 
+        {
+            runRight[i] = new GreenfootImage("images/running/run" + i + ".png");
+            runRight[i].scale(100, 100);
+        }
+        
+        for (int i = 0; i < runLeft.length; i++) 
+        {
+            runLeft[i] = new GreenfootImage("images/running/run" + i + ".png");
+            runLeft[i].mirrorHorizontally();
+            runLeft[i].scale(100, 100);
+        }
         animationTimer.mark();
         
         setImage(idleRight[0]);
@@ -46,15 +60,26 @@ public class Elephant extends Actor
             return;
         }        
         animationTimer.mark();
-        if(facing.equals("right")) 
+        if(facing.equals("right") && Greenfoot.isKeyDown("right") == false) 
         {
             setImage(idleRight[imageIndex]);
             imageIndex = (imageIndex + 1) %idleRight.length;
         }
-        else 
+        else if (facing.equals("left") && Greenfoot.isKeyDown("left") == false)
         {
             setImage(idleLeft[imageIndex]);
             imageIndex = (imageIndex + 1) %idleLeft.length;
+        }
+        
+        if(facing.equals("right") && Greenfoot.isKeyDown("right") == true) 
+        {
+            setImage(runRight[imageIndex]);
+            imageIndex = (imageIndex + 1) %runRight.length;
+        }
+        else if (facing.equals("left") && Greenfoot.isKeyDown("left") == true) 
+        {
+            setImage(runLeft[imageIndex]);
+            imageIndex = (imageIndex + 1) %runLeft.length;
         }
     }
     /*GreenfootImage[] right = new GreenfootImage[2];
