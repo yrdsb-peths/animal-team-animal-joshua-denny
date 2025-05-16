@@ -28,7 +28,7 @@ public class Elephant extends Actor
     GreenfootImage jumpRight[]  = new GreenfootImage[10];  // jump0.png to jump9.png facing right
     GreenfootImage jumpLeft[]   = new GreenfootImage[10];  // mirrored jump images for left
     final int floorHeight = 0; // adjust this to your floor/platform height
-
+    int size = 75;
     String facing = "right";
     SimpleTimer animationTimer = new SimpleTimer();
     SimpleTimer jumpCooldownTimer = new SimpleTimer();
@@ -44,33 +44,33 @@ public class Elephant extends Actor
         for (int i = 0; i < idleRight.length; i++) 
         {
             idleRight[i] = new GreenfootImage("images/idleAnimation/idle" + i + ".png");
-            idleRight[i].scale(100, 100);
+            idleRight[i].scale(size, size);
 
             idleLeft[i] = new GreenfootImage("images/idleAnimation/idle" + i + ".png");
             idleLeft[i].mirrorHorizontally();
-            idleLeft[i].scale(100, 100);
+            idleLeft[i].scale(size, size);
         }
 
         // Load running right and left
         for (int i = 0; i < runRight.length; i++) 
         {
             runRight[i] = new GreenfootImage("images/running/run" + i + ".png");
-            runRight[i].scale(100, 100);
+            runRight[i].scale(size, size);
 
             runLeft[i] = new GreenfootImage("images/running/run" + i + ".png");
             runLeft[i].mirrorHorizontally();
-            runLeft[i].scale(100, 100);
+            runLeft[i].scale(size, size);
         }
 
         // Load jump frames right and left (mirrored)
         for (int i = 0; i < jumpRight.length; i++) 
         {
             jumpRight[i] = new GreenfootImage("images/jump/jump" + i + ".png");
-            jumpRight[i].scale(100, 100);
+            jumpRight[i].scale(size, size);
 
             jumpLeft[i] = new GreenfootImage("images/jump/jump" + i + ".png");
             jumpLeft[i].mirrorHorizontally();
-            jumpLeft[i].scale(100, 100);
+            jumpLeft[i].scale(size, size);
         }
 
         animationTimer.mark();
@@ -216,7 +216,7 @@ public class Elephant extends Actor
                     // Reset scale to original 100x100
                     GreenfootImage baseImg = jumpSet[7 + landingFrameCounter];
                     GreenfootImage img = new GreenfootImage(baseImg);
-                    img.scale(100, 100);
+                    img.scale(size, size);
                     setImage(img);
                 }
             }
