@@ -27,7 +27,7 @@ public class TitleScreen extends World
 
     public void act() 
     {
-        if(Greenfoot.isKeyDown("space")) 
+        if(Greenfoot.isKeyDown("enter")) 
         {
             MyWorld gameWorld = new MyWorld();
             Greenfoot.setWorld(gameWorld);
@@ -48,7 +48,7 @@ public class TitleScreen extends World
         addObject(label,259,296);
         label.setLocation(272,229);
         label.setLocation(273,229);
-        Label label2 = new Label("Press <space> to Start", 50);
+        Label label2 = new Label("Press <space> to Jump", 50);
         addObject(label2,241,340);
         label2.setLocation(284,336);
         label2.setLocation(342,325);
@@ -64,5 +64,25 @@ public class TitleScreen extends World
         elephant.setLocation(550,81);
         elephant.setLocation(311,24);
         elephant.setLocation(268,169);
+        label.setLocation(322,211);
+        label.setLocation(237,226);
+        Label label3 = new Label("Press <enter> to start", 50);
+        addObject(label3,263,171);
+        label3.setLocation(383,152);
+        label.setLocation(294,235);
+        label2.setLocation(252,291);
+        label2.setLocation(278,296);
+        label2.setLocation(300,287);
+        label.setLocation(302,260);
+        label.setLocation(290,231);
+        label.setLocation(301,236);
+        label3.setLocation(238,191);
+        elephant.setLocation(301,132);
+        label3.setLocation(278,46);
+        label3.setLocation(289,49);
+        label3.setLocation(325,50);
+        label3.setLocation(269,62);
+        elephant.setLocation(286,177);
+        label3.setLocation(297,40);
     }
 }
