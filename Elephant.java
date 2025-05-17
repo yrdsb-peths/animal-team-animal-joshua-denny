@@ -129,6 +129,8 @@ public class Elephant extends Actor
                 world.gameOver();
             }
         }
+        drawJumpCooldownBar();
+
     }
 
     public void prepareJump()
@@ -260,7 +262,32 @@ public class Elephant extends Actor
             imageIndex = (imageIndex + 1) % runLeft.length;
         }
     }
+    
+    public void drawJumpCooldownBar()
+    {
+        int barWidth = 50;
+        int barHeight = 6;
+        int offsetY = 75;
+    
+        GreenfootImage baseImage = new GreenfootImage(getImage()); // Copy current image
+        GreenfootImage bar = new GreenfootImage(barWidth, barHeight);
+    
+        int elapsed = jumpCooldownTimer.millisElapsed();
+        int fillWidth = Math.min((int)((double)elapsed / jumpCooldownDuration * barWidth), barWidth);
+    
+        // Colors
+        bar.setColor(Color.GRAY);   // Background
+        bar.fill();
+    
+        bar.setColor(Color.GREEN);  // Fill
+        bar.fillRect(0, 0, fillWidth, barHeight);
+    
+        baseImage.drawImage(bar, (baseImage.getWidth() - barWidth) / 2, baseImage.getHeight() - offsetY);
+    
+        setImage(baseImage);
+    }
 
+    
     public void eat() 
     {
         if (isTouching(Apple.class)) 
