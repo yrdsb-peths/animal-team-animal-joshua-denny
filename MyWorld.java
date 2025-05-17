@@ -8,50 +8,41 @@ public class MyWorld extends World {
 
     private boolean isGameOver = false;
 
-    public boolean getGameOver()
-    {
-        return isGameOver;
-    }
-
-    public void gameOver()
-    {
-        isGameOver = true;
-        showText("Game Over!", getWidth() / 2, getHeight() / 2);
-    }
-
     private Elephant elephant;
-    SimpleTimer obstacleTimer = new SimpleTimer(); // Use this for timing
+    SimpleTimer obstacleTimer = new SimpleTimer(); // Timer for obstacle spawning
+    private int frameCounter = 0;
+    private int spawnInterval = Greenfoot.getRandomNumber(400) + 100; // for example, between 100 and 500 frames
 
+    
     public MyWorld() {
         super(640, 359, 1, false);
 
-        // Assign to field, NOT local variable
+        // Add elephant
         elephant = new Elephant();
         addObject(elephant, 300, getHeight() - floorHeight - elephant.getImage().getHeight() / 2);
 
-
+        // Add score label
         scoreLabel = new Label(0, 20);
         addObject(scoreLabel, 20, 20);
 
-        createApple();
-
+        // Set background
         GreenfootImage bg = new GreenfootImage("images/download.jpg");
         setBackground(bg);
+
+        createApple(); // Initial apple spawn
     }
 
-    public void increaseScore() 
-    {
+    public void increaseScore() {
         score++;
         scoreLabel.setValue(score);
 
-        if(score % 5 == 0) {
+        if (score % 5 == 0) {
             level += 1;
         }
     }
 
-    public void createApple()
-    {
-        if (isGameOver) return; // Don't spawn apple if game is over
+    public void createApple() {
+        if (isGameOver) return; // Don't spawn if game is over
 
         Apple apple = new Apple();
         apple.setSpeed(level);
@@ -60,32 +51,36 @@ public class MyWorld extends World {
         addObject(apple, x, y);
     }
 
-    public void act()
-    {
-        if (isGameOver) return; // Stop everything if game is over
+    public void act() {
+        if (isGameOver) return;
 
-        if (obstacleTimer.millisElapsed() > Greenfoot.getRandomNumber(20000) + 5000)  // random long delay
-        {
+        frameCounter++;
+        
+        if (frameCounter > spawnInterval) {
             spawnObstacle();
-            obstacleTimer.mark();
+            frameCounter = 0;
+            spawnInterval = Greenfoot.getRandomNumber(400) + 100;  // reset interval for next spawn
         }
     }
 
     public void spawnObstacle() {
+        if (isGameOver) return; // Don't spawn if game is over
+
         Obstacle snake = new Obstacle();
-    
+
         int floorY = getHeight() - floorHeight;
-    
-        // Elephant feet Y position
-        int elephantFeetY = elephant.getY() + elephant.getImage().getHeight() / 2;
-    
-        // Snake half height
         int snakeHalfHeight = snake.getImage().getHeight() / 2;
-    
-        // Use floorY for better consistency
         int snakeY = floorY - snakeHalfHeight;
-    
+
         addObject(snake, getWidth(), snakeY);
     }
-    
+
+    public void gameOver() {
+        isGameOver = true;
+        showText("Game Over!", getWidth() / 2, getHeight() / 2);
+    }
+
+    public boolean getGameOver() {
+        return isGameOver;
+    }
 }

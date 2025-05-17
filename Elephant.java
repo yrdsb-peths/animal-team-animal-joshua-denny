@@ -15,8 +15,12 @@ public class Elephant extends Actor
 
     // Jump preparation state
     boolean preparingJump = false;
-    int jumpPrepDelay = 100; // milliseconds
-    SimpleTimer jumpPrepTimer = new SimpleTimer();
+    int jumpPrepFrames = 6; // Roughly equivalent to 100 ms at 60 fps
+    int jumpPrepCounter = 0;
+
+    // Cooldown using frame-based timing
+    int jumpCooldownCounter = 0;
+    int jumpCooldownFrames = 60; // Equivalent to ~1 second at 60 fps
 
     // Audio
     GreenfootSound elephantSound = new GreenfootSound("elephant-scream.mp3");
@@ -33,15 +37,13 @@ public class Elephant extends Actor
     int size = 75;
     String facing = "right";
 
-    SimpleTimer animationTimer = new SimpleTimer();
-    SimpleTimer jumpCooldownTimer = new SimpleTimer();
-    int jumpCooldownDuration = 1000;
+    int animationCounter = 0;
+    int animationDelay = 6;
     int imageIndex = 0;
 
     public Elephant() 
     {
         setRotation(0);
-        jumpCooldownTimer.mark();
 
         // Load idle and mirrored
         for (int i = 0; i < idleRight.length; i++) 
@@ -73,7 +75,6 @@ public class Elephant extends Actor
             jumpLeft[i].scale(size, size);
         }
 
-        animationTimer.mark();
         setImage(idleRight[0]);
     }
 
@@ -97,18 +98,23 @@ public class Elephant extends Actor
             facing = "right";
         }
 
-        // Prepare for jump if not already in delay
-        if (Greenfoot.isKeyDown("space") && onGround && !preparingJump && jumpCooldownTimer.millisElapsed() > jumpCooldownDuration) 
+        if (jumpCooldownCounter < jumpCooldownFrames) jumpCooldownCounter++;
+
+        if (Greenfoot.isKeyDown("space") && onGround && !preparingJump && jumpCooldownCounter >= jumpCooldownFrames) 
         {
             prepareJump();
         }
 
-        // Finish jump after delay
-        if (preparingJump && jumpPrepTimer.millisElapsed() >= jumpPrepDelay)
+        if (preparingJump) 
         {
-            executeJump();
-            jumpCooldownTimer.mark();
-            preparingJump = false;
+            jumpPrepCounter++;
+            if (jumpPrepCounter >= jumpPrepFrames)
+            {
+                executeJump();
+                jumpCooldownCounter = 0;
+                preparingJump = false;
+                jumpPrepCounter = 0;
+            }
         }
 
         handleJumping();
@@ -121,7 +127,6 @@ public class Elephant extends Actor
         if (currentWorld instanceof MyWorld)
         {
             MyWorld world = (MyWorld) currentWorld;
-
             eat();
 
             if (isTouching(Obstacle.class)) 
@@ -129,14 +134,14 @@ public class Elephant extends Actor
                 world.gameOver();
             }
         }
-        drawJumpCooldownBar();
 
+        drawJumpCooldownBar();
     }
 
     public void prepareJump()
     {
         preparingJump = true;
-        jumpPrepTimer.mark();
+        jumpPrepCounter = 0;
 
         GreenfootImage[] jumpSet = (facing.equals("right")) ? jumpRight : jumpLeft;
         setImage(jumpSet[0]); // Crouch/charge frame
@@ -238,8 +243,9 @@ public class Elephant extends Actor
 
     public void animateIdle() 
     {
-        if (animationTimer.millisElapsed() < 100) return;
-        animationTimer.mark();
+        animationCounter++;
+        if (animationCounter < animationDelay) return;
+        animationCounter = 0;
 
         if (facing.equals("right") && !Greenfoot.isKeyDown("right")) 
         {
@@ -262,32 +268,29 @@ public class Elephant extends Actor
             imageIndex = (imageIndex + 1) % runLeft.length;
         }
     }
-    
+
     public void drawJumpCooldownBar()
     {
         int barWidth = 50;
         int barHeight = 6;
         int offsetY = 75;
-    
-        GreenfootImage baseImage = new GreenfootImage(getImage()); // Copy current image
+
+        GreenfootImage baseImage = new GreenfootImage(getImage());
         GreenfootImage bar = new GreenfootImage(barWidth, barHeight);
-    
-        int elapsed = jumpCooldownTimer.millisElapsed();
-        int fillWidth = Math.min((int)((double)elapsed / jumpCooldownDuration * barWidth), barWidth);
-    
-        // Colors
-        bar.setColor(Color.GRAY);   // Background
+
+        int fillWidth = Math.min((int)((double)jumpCooldownCounter / jumpCooldownFrames * barWidth), barWidth);
+
+        bar.setColor(Color.GRAY);
         bar.fill();
-    
-        bar.setColor(Color.GREEN);  // Fill
+
+        bar.setColor(Color.GREEN);
         bar.fillRect(0, 0, fillWidth, barHeight);
-    
+
         baseImage.drawImage(bar, (baseImage.getWidth() - barWidth) / 2, baseImage.getHeight() - offsetY);
-    
+
         setImage(baseImage);
     }
 
-    
     public void eat() 
     {
         if (isTouching(Apple.class)) 
