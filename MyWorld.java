@@ -6,7 +6,7 @@ public class MyWorld extends World {
     int level = 1;
     final int floorHeight = 0;
 
-    private boolean isGameOver = false;
+    public boolean isGameOver = false;
 
     private Elephant elephant;
     SimpleTimer obstacleTimer = new SimpleTimer(); // Timer for obstacle spawning

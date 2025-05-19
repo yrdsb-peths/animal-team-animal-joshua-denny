@@ -40,6 +40,13 @@ public class Elephant extends Actor
     int animationCounter = 0;
     int animationDelay = 6;
     int imageIndex = 0;
+    
+    boolean dead = false;
+    int deathGravity = 1;
+    int deathJumpStrength = -15;
+    int deathRotation = 0;
+    boolean deathSide = false;
+    int totalCount = 0;
 
     public Elephant() 
     {
@@ -82,62 +89,101 @@ public class Elephant extends Actor
     {
         
         World currentWorld = getWorld();
-
-        if (currentWorld instanceof MyWorld) {
-            MyWorld world = (MyWorld) currentWorld;
-            if (world.getGameOver()) return;
-        }
-
-        if (Greenfoot.isKeyDown("left")) 
+        
+        if (!dead)
         {
-            move(-6);
-            facing = "left";
-        } 
-        else if (Greenfoot.isKeyDown("right")) 
-        {
-            move(6);
-            facing = "right";
-        }
-
-        if (jumpCooldownCounter < jumpCooldownFrames) jumpCooldownCounter++;
-
-        if (Greenfoot.isKeyDown("space") && onGround && !preparingJump && jumpCooldownCounter >= jumpCooldownFrames) 
-        {
-            prepareJump();
-        }
-
-        if (preparingJump) 
-        {
-            jumpPrepCounter++;
-            if (jumpPrepCounter >= jumpPrepFrames)
-            {
-                executeJump();
-                jumpCooldownCounter = 0;
-                preparingJump = false;
-                jumpPrepCounter = 0;
+            if (currentWorld instanceof MyWorld) {
+                MyWorld world = (MyWorld) currentWorld;
+                if (world.getGameOver());
             }
-        }
+            if (Greenfoot.isKeyDown("left")) 
+            {
+                move(-6);
+                facing = "left";
+            } 
+            else if (Greenfoot.isKeyDown("right")) 
+            {
+                move(6);
+                facing = "right";
+            }
     
-
-        handleJumping();
-
-        if (!jumping && !justLanded && !preparingJump) 
-        {
-            animateIdle();
-        }
-
-        if (currentWorld instanceof MyWorld)
-        {
-            MyWorld world = (MyWorld) currentWorld;
-            eat();
-
-            if (isTouching(Obstacle.class)) 
+            if (jumpCooldownCounter < jumpCooldownFrames) jumpCooldownCounter++;
+    
+            if (Greenfoot.isKeyDown("space") && onGround && !preparingJump && jumpCooldownCounter >= jumpCooldownFrames) 
             {
-                world.gameOver();
+                prepareJump();
             }
-        }
-
-        drawJumpCooldownBar();
+    
+            if (preparingJump) 
+            {
+                jumpPrepCounter++;
+                if (jumpPrepCounter >= jumpPrepFrames)
+                {
+                    executeJump();
+                    jumpCooldownCounter = 0;
+                    preparingJump = false;
+                    jumpPrepCounter = 0;
+                }
+            }
+        
+    
+            handleJumping();
+    
+            if (!jumping && !justLanded && !preparingJump) 
+            {
+                animateIdle();
+            }
+    
+            if (currentWorld instanceof MyWorld)
+            {
+                MyWorld world = (MyWorld) currentWorld;
+                eat();
+    
+                if (isTouching(Obstacle.class)) 
+                {
+                    dead = true;
+                    world.gameOver();
+                    GreenfootImage death = new GreenfootImage("images/death.png");
+                    death.scale(size,size);
+                    setImage(death);        
+                    deathSide = (Greenfoot.getRandomNumber(2) != 0); // left = false; right = true;
+                }
+            }
+    
+            drawJumpCooldownBar();
+        } 
+        else 
+        {
+            deathJumpStrength += deathGravity;
+            if (deathSide)
+            {
+                deathRotation -= 4;
+                setRotation(deathRotation);
+                setLocation(getX() + 4, getY() + deathJumpStrength);
+            }
+            else
+            {
+                deathRotation += 4;
+                setRotation(deathRotation);
+                setLocation(getX() - 4, getY() + deathJumpStrength);
+            }
+            
+            if (totalCount < 25)
+            {
+                totalCount++;
+                for(int i = 0; i < 3; i++)
+                {
+                    double[] balls = {getX(), getY()};
+                    Particles particle = new Particles(balls, Greenfoot.getRandomNumber(360) - 135.0, Greenfoot.getRandomNumber(5) + 2.5, Color.RED);
+                    currentWorld.addObject(particle, currentWorld.getWidth()/2, currentWorld.getHeight()/2);
+                }
+            }
+            
+            if(getX() < -100) 
+            {
+                return;
+            }
+        }   
     }
 
     public void prepareJump()
