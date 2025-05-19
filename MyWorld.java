@@ -56,6 +56,11 @@ public class MyWorld extends World {
 
         frameCounter++;
         
+        /* Particle System testing
+        double[] balls = {640/2, 359/2};
+        Particles particle = new Particles(balls, Greenfoot.getRandomNumber(180) - 135.0, Greenfoot.getRandomNumber(5) + 2.5, Color.RED);
+        addObject(particle, 640/2, 359/2);
+        */
         if (frameCounter > spawnInterval) {
             spawnObstacle();
             frameCounter = 0;

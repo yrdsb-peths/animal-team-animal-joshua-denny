@@ -80,6 +80,7 @@ public class Elephant extends Actor
 
     public void act()
     {
+        
         World currentWorld = getWorld();
 
         if (currentWorld instanceof MyWorld) {
@@ -116,6 +117,7 @@ public class Elephant extends Actor
                 jumpPrepCounter = 0;
             }
         }
+    
 
         handleJumping();
 
