@@ -59,7 +59,7 @@ public class MyWorld extends World {
         if (frameCounter > spawnInterval) {
             spawnObstacle();
             frameCounter = 0;
-            spawnInterval = Greenfoot.getRandomNumber(400) + 100;  // reset interval for next spawn
+            spawnInterval = Greenfoot.getRandomNumber(400) + 400 - (level * 100);  // reset interval for next spawn
         }
     }
 
