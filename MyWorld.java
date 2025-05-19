@@ -65,18 +65,15 @@ public class MyWorld extends World {
 
     public void spawnObstacle() {
         if (isGameOver) return; // Don't spawn if game is over
-        //boolean snakeSpawnSide = (Greenfoot.getRandomNumber(1) != 0); // left = false; right = true;
-        boolean snakeSpawnSide = false; // left = false; right = true;
+        
+        boolean snakeSpawnSide = (Greenfoot.getRandomNumber(2) != 0); // left = false; right = true;
 
         Obstacle snake = new Obstacle(snakeSpawnSide);
 
         int floorY = getHeight() - floorHeight;
         int snakeHalfHeight = snake.getImage().getHeight() / 2;
-        int snakePosY = floorY - snakeHalfHeight;
-        int snakePosX = (snakeSpawnSide ? getWidth() : 0);
-        
-        System.out.println(snakePosX);
-        
+        int snakePosY = floorY - snakeHalfHeight; // Moves the snake sprite up from the ground.
+        int snakePosX = (snakeSpawnSide ? getWidth() : 0); // Randomizes the spawn side for the snake
 
         addObject(snake, snakePosX, snakePosY);
     }
