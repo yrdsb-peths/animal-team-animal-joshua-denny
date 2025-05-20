@@ -24,6 +24,8 @@ public class Elephant extends Actor
 
     // Audio
     GreenfootSound elephantSound = new GreenfootSound("elephant-scream.mp3");
+    GreenfootSound elephantDeathSound = new GreenfootSound("elephant-death.mp3");
+
 
     // Animation arrays
     GreenfootImage idleRight[]  = new GreenfootImage[8];
@@ -147,6 +149,7 @@ public class Elephant extends Actor
                     death.scale(size,size);
                     setImage(death);        
                     deathSide = (Greenfoot.getRandomNumber(2) != 0); // left = false; right = true;
+                    elephantDeathSound.play();
                 }
             }
     
