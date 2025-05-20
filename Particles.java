@@ -1,7 +1,7 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.lang.Math;
 /**
- * Particle System.
+ * Particles for Greenfoot.
  * 
  * @author Denny ung
  * @version Version 1.0.0 (May 18th 2025)
